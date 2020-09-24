@@ -56,31 +56,22 @@ public class BST {
     
     //Finding the minimum value
     public int findMinValue(Node root) {
-        if (root == null) {
-            return root.data;
-        }
-
-        else if (root.left == null) {
-            return root.data;
-        }
+        Node current = root;
         
-        else {
-            return findMinValue(root.left);
+        while (current.left != null) {
+            current = current.left;
         }
+        return current.data;
     }
     
     //Finding the maximum value
     public int findMaxValue(Node root) {
-        if (root == null) {
-            return root.data;
-        }
+        Node current = root;
         
-        else if (root.right == null) {
-            return root.data;
+        while (current.right != null) {
+            current = current.right;
         }
-        else {
-            return findMaxValue(root.right);
-        }
+        return current.data;
     }
     
     //helper method to delete
