@@ -1,7 +1,6 @@
 package covid19trackingmanager;
 
 public class BST {
-    
     //Node containing data and ability to go left and right
     class Node {
         String data;
@@ -17,12 +16,15 @@ public class BST {
         
     }
     
-    //the beginning node of BST
+    // Fields
     private Node root;
+    private int nodes;
+    private String titleLine = "date,state,positive,negative,hospitalized,onVentilatorCurrently,onVentilatorCumulative,recovered,dataQualityGrade,death";
     
     //Constructor for an empty tree
     public BST() {
-        root = null;
+        this.root = null;
+        this.nodes = 0;
     }
     
     //make empty
@@ -50,6 +52,11 @@ public class BST {
         else if (data.compareTo(root.data) > 0){
             root.right = insertHelper(data, root.right);
         }
+
+        System.out.println("Low quality data rejected for _ _");
+        System.out.println("Data has been updated for _ _");
+        System.out.println("State of _ does not exist!");
+        System.out.println("Data has been updated for the missing data in _");
         
         return root;
     }
