@@ -4,11 +4,11 @@ public class BST {
     
     //Node containing data and ability to go left and right
     class Node {
-        int data;
+        String data;
         Node left;
         Node right;
         
-        public Node(int data) {
+        public Node(String data) {
             this.data = data;
             left = null;
             right = null;
@@ -30,19 +30,24 @@ public class BST {
         root = null;
     }
     
+    //checking for empty
+    public boolean isEmpty() {
+       return (root == null);
+    }
+    
     //insertHelper is a helper method to insert
-    public Node insertHelper(int data, Node root) {
+    public Node insertHelper(String data, Node root) {
         //if it is empty, simply make the root the new data and return it
         if (root == null) {
             root = new Node(data);
             return root;
         }
         //checking if it is to the left
-        else if (data < root.data) {
+        else if (data.compareTo(root.data) < 0) {
             root.left = insertHelper(data, root.left);
         }
         //or to the right
-        else {
+        else if (data.compareTo(root.data) > 0){
             root.right = insertHelper(data, root.right);
         }
         
@@ -50,12 +55,12 @@ public class BST {
     }
     
     //Insert to a tree using the helper insertRecursion method
-    public void insert(int data) {
+    public void insert(String data) {
         root = insertHelper(data, root);
     }
     
     //Finding the minimum value
-    public int findMinValue(Node root) {
+    public String findMinValue(Node root) {
         Node current = root;
         
         while (current.left != null) {
@@ -64,8 +69,16 @@ public class BST {
         return current.data;
     }
     
+    public String findMinValue() {
+        return findMinValue(root);
+    }
+    
+    public String findMaxValue() {
+        return findMaxValue(root);
+    }
+    
     //Finding the maximum value
-    public int findMaxValue(Node root) {
+    public String findMaxValue(Node root) {
         Node current = root;
         
         while (current.right != null) {
@@ -75,16 +88,16 @@ public class BST {
     }
     
     //helper method to delete
-    public Node deleteHelper(int data, Node root) {
+    public Node deleteHelper(String data, Node root) {
         
         if (root == null) {
             return root;
         }
         
-        else if (data > root.data) {
+        else if (data.compareTo(root.data) > 0) {
             root.right = deleteHelper(data, root.right);
         }
-        else if (data < root.data) {
+        else if (data.compareTo(root.data) < 0) {
             root.left = deleteHelper(data, root.left);
         }
         
@@ -104,23 +117,23 @@ public class BST {
     }
     
     //delete method
-    public void delete(int data) {
+    public void delete(String data) {
         root = deleteHelper(data, root);
     }
     
-    //finding method
-    public boolean find(Node root, int data) {
+    //finding method (internal)
+    public boolean find(Node root, String data) {
         boolean found = false;
         
         if (root == null) {
             found = false;
         }
         //checking if it is to the left
-        else if (data < root.data) {
+        else if (data.compareTo(root.data) < 0) {
             root.left = insertHelper(data, root.left);
         }
         //or to the right
-        else if (data > root.data) {
+        else if (data.compareTo(root.data) > 0) {
             root.right = insertHelper(data, root.right);
         }
         
@@ -128,5 +141,9 @@ public class BST {
             found = true;
         }
         return found;
+    }
+    
+    public boolean find(String data) {
+        return find(root, data);
     }
 }
