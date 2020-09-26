@@ -34,6 +34,7 @@ public class BST {
     
     //checking for empty
     public boolean isEmpty() {
+       this.nodes = 0;
        return (root == null);
     }
     
@@ -64,6 +65,7 @@ public class BST {
     //Insert to a tree using the helper insertRecursion method
     public void insert(String data) {
         root = insertHelper(data, root);
+        this.nodes++;
     }
     
     //Finding the minimum value
@@ -126,6 +128,7 @@ public class BST {
     //delete method
     public void delete(String data) {
         root = deleteHelper(data, root);
+        this.nodes--;
     }
     
     //finding method (internal)
@@ -152,5 +155,9 @@ public class BST {
     
     public boolean find(String data) {
         return find(root, data);
+    }
+    
+    public int getSize() {
+        return this.nodes; 
     }
 }

@@ -8,7 +8,7 @@ public class Covid19TrackingManager extends BST {
 
     private BST binaryTree = new BST();
     private String titleLine = "state   positive    negative    hospitalized   onVentilatorCurrently    onVentilatorCumulative   recovered   dataQualityGrade   death";
-    private String summaryTitle = ""
+    private String summaryTitle = "";
     
     public static void main(String[] args){
         if(length(args) == 0 || length(args) > 4){
@@ -73,11 +73,11 @@ public class Covid19TrackingManager extends BST {
     }
 
     public void search(){
-        if(binaryTree.nodes == 0){
+        if(binaryTree.getSize() == 0){
             System.out.println("No available data");
             return;
         }
-        this.searchDate(Integer.toString(binaryTree.findMax()))
+        this.searchDate((binaryTree.findMaxValue()));
     }
 
     public void searchDate(String date){
@@ -158,7 +158,7 @@ public class Covid19TrackingManager extends BST {
     }
 
     public void summaryData(){
-        if(binaryTree.nodes == 0){
+        if(binaryTree.getSize() == 0){
             System.out.println("No available data");
             return;
         }
@@ -182,10 +182,10 @@ public class Covid19TrackingManager extends BST {
         }
         System.out.println("Data Summary for " + binaryTree.nodes + " states");
         System.out.println("State   Total Case  Total Death   Total Hospitalized");
-        Systme.out.println(print);
-        Systme.out.println("Total Cases: " + Integer.toString(totCas));
-        Systme.out.println("Total Deaths: " + Integer.toString(totDth));
-        Systme.out.println("Total Hospitalized: " + Integer.toString(totHos));
+        System.out.println(print);
+        System.out.println("Total Cases: " + Integer.toString(totCas));
+        System.out.println("Total Deaths: " + Integer.toString(totDth));
+        System.out.println("Total Hospitalized: " + Integer.toString(totHos));
     }
 
     public void dumpData(String filename){
