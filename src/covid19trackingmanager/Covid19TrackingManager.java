@@ -4,11 +4,38 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class Covid19TrackingManager extends BST {
+public class Covid19TrackingManager{
 
-    private BST binaryTree = new BST();
     private String titleLine = "state   positive    negative    hospitalized   onVentilatorCurrently    onVentilatorCumulative   recovered   dataQualityGrade   death";
     private String summaryTitle = "";
+    private ArrayList<Node> array;
+
+    public class Node(){
+        private int date;
+        private String state;
+        private int positive;
+        private int negative;
+        private int hospitalized;
+        private int onVentilatorCurrently;
+        private int onVentilatorCumulative;
+        private int recovered;
+        private String dataQualityGrade;
+        private int death;
+ 
+        public Node(int date, String state, int positive, int negative, int hospitalized, 
+            int onVentilatorCurrently, int onVentilatorCumulative, int recovered, String dataQualityGrade, int death;){
+            this.date = date;
+            this.state = state;
+            this.positive = positive;
+            this.negative = negative;
+            this.hospitalized = hospitalized;
+            this.onVentilatorCurrently = onVentilatorCurrently;
+            this.onVentilatorCumulative = onVentilatorCumulative;
+            this.recovered = recovered;
+            this.dataQualityGrade = dataQualityGrade;
+            this.death = death;
+            }
+    }
     
     public static void main(String[] args){
         if(length(args) == 0 || length(args) > 4){
@@ -44,6 +71,8 @@ public class Covid19TrackingManager extends BST {
     }
 
     public void loadFile(String filename){
+        array = new ArrayList()<Node>;
+
         File dataFile;
         try{
             dataFile = new File(filename);
@@ -56,20 +85,193 @@ public class Covid19TrackingManager extends BST {
         Scanner scan = new Scanner(dataFile);
         System.out.println("Finished loading" + filename);
         int records = 0;
+        String[] params;
+
         while(scan.hasNextLine()){
             if(records == 0){
                 continue;
             }
-            binaryTree.insert(scan.nextLine())
+            params = scan.nextLine().split(",");
             records++;
+            Node newNode = new Node(Integer.parseInt(params[0]), params[1], Integer.parseInt(params[2]), Integer.parseInt(params[3]), 
+                Integer.parseInt(params[4]),Integer.parseInt(params[5]), Integer.parseInt(params[6]), Integer.parseInt(params[7]),
+                params[8], Integer.parseInt(params[9]));
+            if(validState(newNode.state)){
+                System.out.println("State of " + newNode.state + " does not exist!");
+            }
+            this.addNode(newNode);
         }
-        if(records == 0){
-            num = "no";
+        System.out.println(Integer.toString(records) + "records have been loaded");
+    }
+
+    public Boolean validState(String state){
+        String stateConv = state.toUpperCase();
+        States[] stateAr = States.values();
+        Boolean match = false;
+        for(States st : stateAr){
+            if(stateConv.equals(st.getFullName())){
+                match = true;
+            }
+        }
+        return !match;
+    }
+
+    public void addNode(Node newNode){
+        if(array.size() == 0){
+            array.add(newNode);
+        }
+        Boolean state = false;
+        int stateInd;
+        Boolean date = false;
+        int dateInd;
+        for(int index = 0; index < array.size(); index++){
+            if(newNode.state == array.get(index).state){
+                state = true;
+                stateInd = index;
+            }
+            if(newNode.date == array.get(index).date){
+                date = true;
+                dateInd = index;
+            }
+        }
+        if(state){
+            if(!date){
+                array.add(newNode);
+            }
+            int nnq;
+            int ssq;
+            String[]
+            switch(newNode.dataQualityGrade){
+                case "A+":
+                    nnq = 1;
+                    break;
+                case "A":
+                    nnq = 2;
+                    break;
+                case "A-":
+                    nnq = 3;
+                    break;
+                case "B+":
+                    nnq = 4;
+                    break;
+                case "B":
+                    nnq = 5;
+                    break;
+                case "B-":
+                    nnq = 6;
+                    break;
+                case "C+":
+                    nnq = 7;
+                    break;
+                case "C":
+                    nnq = 8;
+                    break;
+                case "C-":
+                    nnq = 9;
+                    break;
+                case "D+":
+                    nnq = 10;
+                    break;
+                case "D":
+                    nnq = 11;
+                    break;
+                case "D-":
+                    nnq = 12;
+                    break;
+                default:
+                    System.out.println("error handling grades");
+                    System.exit();
+            }
+            switch(array.get(stateInd).dataQualityGrade){
+                case "A+":
+                    ssq = 1;
+                    break;
+                case "A":
+                    ssq = 2;
+                    break;
+                case "A-":
+                    ssq = 3;
+                    break;
+                case "B+":
+                    ssq = 4;
+                    break;
+                case "B":
+                    ssq = 5;
+                    break;
+                case "B-":
+                    ssq = 6;
+                    break;
+                case "C+":
+                    ssq = 7;
+                    break;
+                case "C":
+                    ssq = 8;
+                    break;
+                case "C-":
+                    ssq = 9;
+                    break;
+                case "D+":
+                    ssq = 10;
+                    break;
+                case "D":
+                    ssq = 11;
+                    break;
+                case "D-":
+                    ssq = 12;
+                    break;
+                default:
+                    System.out.println("error handling grades");
+                    System.exit();
+            }
+            if(nnq > ssq){
+                this.update(newNode, array.get(stateInd));
+                array.remove(stateInd);
+                array.add(stateInd, newNode);
+                System.out.println("Data has been updated for" + newNode.state + " " + Integer.toString(newNode.date));
+            }
+            else{
+                this.update(array.get(stateInd), newNode);
+                System.out.println("Low quality data rejected for " + newNode.state);
+            }
         }
         else{
-            String num = Integer.toString(records);
+            array.add(newNode);
         }
-        System.out.println(records + "records have been loaded");
+    }
+
+    public Node update(Node highNode, Node lowNode){
+        Boolean updated = false;
+        if(highNode.positive == 0 && lowNode.positive != 0){
+            highNode.positive = lowNode.positive;
+            updated = true;
+        }
+        if(highNode.negative == 0 && lowNode.negative != 0){
+            highNode.negative = lowNode.negative;
+            updated = true;
+        }
+        if(highNode.hospitalized == 0 && lowNode.hospitalized != 0){
+            highNode.hospitalized = lowNode.hospitalized;
+            updated = true;
+        }
+        if(highNode.onVentilatorCurrently == 0 && lowNode.onVentilatorCurrently != 0){
+            highNode.onVentilatorCurrently = lowNode.onVentilatorCurrently;
+            updated = true;
+        }
+        if(highNode.onVentilatorCumulative == 0 && lowNode.onVentilatorCumulative != 0){
+            highNode.onVentilatorCumulative = lowNode.onVentilatorCumulative;
+            updated = true;
+        }
+        if(highNode.recovered == 0 && lowNode.recovered != 0){
+            highNode.recovered = lowNode.recovered;
+            updated = true;
+        }
+        if(highNode.death == 0 && lowNode.death != 0){
+            highNode.death = lowNode.death;
+            updated = true;
+        }
+        if(updated){
+            System.out.println("Data has been updated for the missing data in " + highNode.state);
+        }
     }
 
     public void search(){
