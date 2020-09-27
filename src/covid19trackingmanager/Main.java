@@ -3,6 +3,7 @@ package covid19trackingmanager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -122,6 +123,17 @@ public class Main {
         initials.put("vi", "virgin islands");
     }
     
+    public String getState(String state) {
+        if(state.length() == 2) {
+            return state.toLowerCase();
+        }
+        for(Map.Entry<String, String> entry: initials.entrySet()) {
+            if(state.equalsIgnoreCase(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
 
     public static void main(String[] args) {
         Main main = new Main();
