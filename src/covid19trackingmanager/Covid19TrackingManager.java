@@ -2,397 +2,243 @@ package covid19trackingmanager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Covid19TrackingManager {
-
+    
     private String titleLine = "state   positive    negative    hospitalized   onVentilatorCurrently    onVentilatorCumulative   recovered   dataQualityGrade   death";
     private String summaryTitle = "";
-    private ArrayList<Node> array;
-
-    private class Node {
-        private int date;
-        private String state;
-        private int positive;
-        private int negative;
-        private int hospitalized;
-        private int onVentilatorCurrently;
-        private int onVentilatorCumulative;
-        private int recovered;
-        private String dataQualityGrade;
-        private int death;
- 
-        public Node(int date, String state, int positive, int negative, int hospitalized, 
-            int onVentilatorCurrently, int onVentilatorCumulative, int recovered, String dataQualityGrade, int death){
-            this.date = date;
-            this.state = state;
-            this.positive = positive;
-            this.negative = negative;
-            this.hospitalized = hospitalized;
-            this.onVentilatorCurrently = onVentilatorCurrently;
-            this.onVentilatorCumulative = onVentilatorCumulative;
-            this.recovered = recovered;
-            this.dataQualityGrade = dataQualityGrade;
-            this.death = death;
+    private HashMap<String, Node> map = new HashMap<String, Node>();
+    
+    public void load(String filename) {
+        try {
+            Scanner input = new Scanner(new File(filename));
+            int counter = 0;
+            input.next();
+            while(input.hasNext()) {
+                String[] row = input.next().split(",");
+                if (!initials.containsKey(row[1].toLowerCase())) {
+                    System.out.println("State of " + row[1] + " does not exist!");
+                    continue;
+                }
+                if(map.containsKey(row[1])) { // if states match
+                    if(map.get(row[1]).get(0).equals(row[0])) { // if dates match
+                    	if(map.get(row[1]).isGradeHigher(row[8])) { // if map grade is higher than the new grade
+                    		String[] array = map.get(row[1]).getRow();
+                    		for(int i = 0; i < array.length; i++) {
+                                if(array[i].equals("")) { // if there is an empty slot
+                                    map.get(row[1]).setColumn(i, row[i]); // update
+                                    System.out.println("Data has been updated for the missing data in " + row[1]);
+                                }
+                            }
+                    		System.out.println("Low quality data rejected for " + row[1]);
+                        }
+                    	else { // map grade is lower than the new grade
+                    		map.put(row[1], new Node(row)); // replace the old Node with the new one
+                            System.out.println("Data has been updated for " + row[1] + row[0]);
+                    	}
+                } // else the states match but the dates don't match
+                else { // the states don't match
+                    map.put(row[1], new Node(row));
+                    counter++;
+                }
+                }
             }
+        
+            System.out.println("Finished loading " + filename);
+            System.out.println(counter + " records have been loaded");
+        }
+        catch (FileNotFoundException e) {
+            System.out.println("File " + filename + " was not found");
+        }
+        
     }
     
-    public static void main(String[] args){
-        if(args.length == 0 || args.length > 4){
-            System.out.println("error, invalid number of inputs");
-            return;
-        }
-        switch(args[0]){
-            case "load":
-                loadFile(args[1]);
-                break;
-            case "search":
-                if(length(args) == 1){
-                    this.search();
-                }
-                else if(length(args) == 2){
-                    this.searchDate(args[1]);
-                }
-                else{
-                    this.searchState(args);
-                }
-                break;
-            case "summarydata":
-                this.summaryData();
-                break;
-            case "dumpdata":
-                this.dumpData(args[1]);
-                break;
-            default:
-                System.out.println("error, invalid input");
-                break;
-        }
-        return;
+    public void search() {
+    	int date = 0;
+    	for(Map.Entry<String, Node> ent : map.entrySet()) {
+    		int newDate = Integer.parseInt(ent.getValue().get(0));
+    		if (newDate > date) {
+    			date = newDate;
+    		}
+    	}
+    	String strDate = Integer.toString(date);
+    	strDate = String.format("%s/%s/%s", strDate.substring(4, 6), strDate.substring(6, 8), strDate.substring(0, 4));
+    	this.searchDate(strDate);
     }
-
-    public void loadFile(String filename){
-        array = new ArrayList()<Node>;
-
-        File dataFile;
-        try{
-            dataFile = new File(filename);
-        }
-        catch(Exception e){
-            System.out.println("File " + filename + " was not found");
-            return;
-        }
-        
-        Scanner scan = new Scanner(dataFile);
-        System.out.println("Finished loading" + filename);
-        int records = 0;
-        String[] params;
-
-        while(scan.hasNextLine()){
-            if(records == 0){
-                continue;
-            }
-            params = scan.nextLine().split(",");
-            records++;
-            Node newNode = new Node(Integer.parseInt(params[0]), params[1], Integer.parseInt(params[2]), Integer.parseInt(params[3]), 
-                Integer.parseInt(params[4]),Integer.parseInt(params[5]), Integer.parseInt(params[6]), Integer.parseInt(params[7]),
-                params[8], Integer.parseInt(params[9]));
-            if(validState(newNode.state)){
-                System.out.println("State of " + newNode.state + " does not exist!");
-            }
-            this.addNode(newNode);
-        }
-        System.out.println(Integer.toString(records) + "records have been loaded");
+    
+    public void searchDate(String date) {
+    	String print = "";
+    	int counter = 0;
+    	for(Map.Entry<String, Node> ent : map.entrySet()) {
+    		String newDate = ent.getValue().getDate();
+    		if (newDate.equals(date)) {
+    			for(int index = 1; index < 10; index++) {
+    				print += ent.getValue().get(index) + "    ";
+    			}
+    			print += "\n";
+    			counter++;
+    		}
+    	}
+    	System.out.println("There are " + counter + " records on " + date);
+    	System.out.println(titleLine);
+    	System.out.println(print);
     }
-
-    public Boolean validState(String state){
-        String stateConv = state.toUpperCase();
-        ArrayList stateAr = States.values();
-        Boolean match = false;
-        for(States st : stateAr){
-            if(stateConv.equals(st.getFullName())){
-                match = true;
-            }
-        }
-        return !match;
+    
+    public void searchState(String state) {
+    	String conState = getState(state);
+    	
     }
-
-    public void addNode(Node newNode){
-        if(array.size() == 0){
-            array.add(newNode);
-        }
-        Boolean state = false;
-        int stateInd;
-        Boolean date = false;
-        int dateInd;
-        for(int index = 0; index < array.size(); index++){
-            if(newNode.state == array.get(index).state){
-                state = true;
-                stateInd = index;
-            }
-            if(newNode.date == array.get(index).date){
-                date = true;
-                dateInd = index;
-            }
-        }
-        if(state){
-            if(!date){
-                array.add(newNode);
-            }
-            int nnq;
-            int ssq;
-            String[]
-            switch(newNode.dataQualityGrade){
-                case "A+":
-                    nnq = 1;
-                    break;
-                case "A":
-                    nnq = 2;
-                    break;
-                case "A-":
-                    nnq = 3;
-                    break;
-                case "B+":
-                    nnq = 4;
-                    break;
-                case "B":
-                    nnq = 5;
-                    break;
-                case "B-":
-                    nnq = 6;
-                    break;
-                case "C+":
-                    nnq = 7;
-                    break;
-                case "C":
-                    nnq = 8;
-                    break;
-                case "C-":
-                    nnq = 9;
-                    break;
-                case "D+":
-                    nnq = 10;
-                    break;
-                case "D":
-                    nnq = 11;
-                    break;
-                case "D-":
-                    nnq = 12;
-                    break;
-                default:
-                    System.out.println("error handling grades");
-                    System.exit();
-            }
-            switch(array.get(stateInd).dataQualityGrade){
-                case "A+":
-                    ssq = 1;
-                    break;
-                case "A":
-                    ssq = 2;
-                    break;
-                case "A-":
-                    ssq = 3;
-                    break;
-                case "B+":
-                    ssq = 4;
-                    break;
-                case "B":
-                    ssq = 5;
-                    break;
-                case "B-":
-                    ssq = 6;
-                    break;
-                case "C+":
-                    ssq = 7;
-                    break;
-                case "C":
-                    ssq = 8;
-                    break;
-                case "C-":
-                    ssq = 9;
-                    break;
-                case "D+":
-                    ssq = 10;
-                    break;
-                case "D":
-                    ssq = 11;
-                    break;
-                case "D-":
-                    ssq = 12;
-                    break;
-                default:
-                    System.out.println("error handling grades");
-                    System.exit();
-            }
-            if(nnq > ssq){
-                this.update(newNode, array.get(stateInd));
-                array.remove(stateInd);
-                array.add(stateInd, newNode);
-                System.out.println("Data has been updated for" + newNode.state + " " + Integer.toString(newNode.date));
-            }
-            else{
-                this.update(array.get(stateInd), newNode);
-                System.out.println("Low quality data rejected for " + newNode.state);
-            }
-        }
-        else{
-            array.add(newNode);
-        }
+    
+    private HashMap<String, String> initials;
+    
+    public Covid19TrackingManager() {
+        initials = new HashMap<String, String>();
+        initials.put("al", "alabama");
+        initials.put("ak", "alaska");
+        initials.put("az", "arizona");
+        initials.put("ar", "arkansas");
+        initials.put("ca", "california");
+        initials.put("co", "colorado");
+        initials.put("ct", "connecticut");
+        initials.put("de", "delaware");
+        initials.put("fl", "florida");
+        initials.put("ga", "georgia");
+        initials.put("hi", "hawaii");
+        initials.put("id", "idaho");
+        initials.put("il", "illinois");
+        initials.put("in", "indiana");
+        initials.put("ia", "iowa");
+        initials.put("ks", "kansas");
+        initials.put("ky", "kentucky");
+        initials.put("la", "louisiana");
+        initials.put("me", "maine");
+        initials.put("md", "maryland");
+        initials.put("ma", "massachusetts");
+        initials.put("mi", "michigan");
+        initials.put("mn", "minnesota");
+        initials.put("ms", "mississippi");
+        initials.put("mo", "missouri");
+        initials.put("mt", "montana");
+        initials.put("ne", "nebraska");
+        initials.put("nv", "nevada");
+        initials.put("nh", "new hampshire");
+        initials.put("nj", "new jersey");
+        initials.put("nm", "new mexico");
+        initials.put("ny", "new york");
+        initials.put("nc", "north carolina");
+        initials.put("nd", "north dakota");
+        initials.put("oh", "ohio");
+        initials.put("ok", "oklahoma");
+        initials.put("or", "oregon");
+        initials.put("pa", "pennsylvania");
+        initials.put("ri", "rhode island");
+        initials.put("sc", "south carolina");
+        initials.put("sd", "south dakota");
+        initials.put("tn", "tennessee");
+        initials.put("tx", "texas");
+        initials.put("ut", "utah");
+        initials.put("vt", "vermont");
+        initials.put("va", "virginia");
+        initials.put("wa", "washington");
+        initials.put("wv", "west virginia");
+        initials.put("wi", "wisconsin");
+        initials.put("wy", "wyoming");
+        initials.put("as", "american samoa");
+        initials.put("dc", "district of columbia");
+        initials.put("fm", "federated states of micronesia");
+        initials.put("gu", "guam");
+        initials.put("mh", "marshall islands");
+        initials.put("mp", "northern mariana islands");
+        initials.put("pw", "palau");
+        initials.put("pr", "puerto rico");
+        initials.put("vi", "virgin islands");
+        initials.put("alabama", "al");
+        initials.put("alaska", "ak");
+        initials.put("arizona", "az");
+        initials.put("arkansas", "ar");
+        initials.put("california", "ca");
+        initials.put("colorado", "co");
+        initials.put("connecticut", "ct");
+        initials.put("delaware", "de");
+        initials.put("florida", "fl");
+        initials.put("georgia", "ga");
+        initials.put("hawaii", "hi");
+        initials.put("idaho", "id");
+        initials.put("illinois", "il");
+        initials.put("indiana", "in");
+        initials.put("iowa", "ia");
+        initials.put("kansas", "ks");
+        initials.put("kentucky", "ky");
+        initials.put("louisiana", "la");
+        initials.put("maine", "me");
+        initials.put("maryland", "md");
+        initials.put("massachusetts", "ma");
+        initials.put("michigan", "mi");
+        initials.put("minnesota", "mn");
+        initials.put("mississippi", "ms");
+        initials.put("missouri", "mo");
+        initials.put("montana", "mt");
+        initials.put("nebraska", "ne");
+        initials.put("nevada", "nv");
+        initials.put("new hampshire", "nh");
+        initials.put("new jersey", "nj");
+        initials.put("new mexico", "nm");
+        initials.put("new york", "ny");
+        initials.put("north carolina", "nc");
+        initials.put("north dakota", "nd");
+        initials.put("ohio", "oh");
+        initials.put("oklahoma", "ok");
+        initials.put("oregon", "or");
+        initials.put("pennsylvania", "pa");
+        initials.put("rhode island", "ri");
+        initials.put("south carolina", "sc");
+        initials.put("south dakota", "sd");
+        initials.put("tennessee", "tn");
+        initials.put("texas", "tx");
+        initials.put("utah", "ut");
+        initials.put("vermont", "vt");
+        initials.put("virginia", "va");
+        initials.put("washington", "wa");
+        initials.put("west virginia", "wv");
+        initials.put("wisconsin", "wi");
+        initials.put("wyoming", "wy");
+        initials.put("american samoa", "as");
+        initials.put("district of columbia", "dc");
+        initials.put("federated states of micronesia", "fm");
+        initials.put("guam", "gu");
+        initials.put("marshall islands", "mh");
+        initials.put("northern mariana islands", "mp");
+        initials.put("palau", "pw");
+        initials.put("puerto rico", "pr");
+        initials.put("virgin islands", "vi");
     }
-
-    public Node update(Node highNode, Node lowNode){
-        Boolean updated = false;
-        if(highNode.positive == 0 && lowNode.positive != 0){
-            highNode.positive = lowNode.positive;
-            updated = true;
-        }
-        if(highNode.negative == 0 && lowNode.negative != 0){
-            highNode.negative = lowNode.negative;
-            updated = true;
-        }
-        if(highNode.hospitalized == 0 && lowNode.hospitalized != 0){
-            highNode.hospitalized = lowNode.hospitalized;
-            updated = true;
-        }
-        if(highNode.onVentilatorCurrently == 0 && lowNode.onVentilatorCurrently != 0){
-            highNode.onVentilatorCurrently = lowNode.onVentilatorCurrently;
-            updated = true;
-        }
-        if(highNode.onVentilatorCumulative == 0 && lowNode.onVentilatorCumulative != 0){
-            highNode.onVentilatorCumulative = lowNode.onVentilatorCumulative;
-            updated = true;
-        }
-        if(highNode.recovered == 0 && lowNode.recovered != 0){
-            highNode.recovered = lowNode.recovered;
-            updated = true;
-        }
-        if(highNode.death == 0 && lowNode.death != 0){
-            highNode.death = lowNode.death;
-            updated = true;
-        }
-        if(updated){
-            System.out.println("Data has been updated for the missing data in " + highNode.state);
-        }
-    }
-
-    public void search(){
-        if(binaryTree.getSize() == 0){
-            System.out.println("No available data");
-            return;
-        }
-        this.searchDate((binaryTree.findMaxValue()));
-    }
-
-    public void searchDate(String date){
-        Node root = binaryTree.root;
-        String print = titleLine + "\n";
-        while(root != null){
-            if(Integer.toString(root.date).equals(date)){
-                print += root.print + "\n";
-            }
-            root = root.right;
-        }
-        if(records == 0){
-            System.out.println("There are no records on " + date);
-        }
-        else{
-            String num = Integer.toString(records);
-            System.out.println("There are " + num + " records on " + date);
-            System.out.println(print);
-        }
-    }
-
-    public void searchState(String[] args){
-        String printState = "";
-        String state = "";
-        int recordsToDo = 0;
-        int recordsRec = 0;
-        if(length(args) == 4){
-            state = this.convertState(args[1] + args[2]);
-            printState = args[1] + args[2];
-            recordsToDo = args[3];
-        }
-        else if(length(args[1] != 2)){
-            state = this.convertState(args[1]);
-            printState = args[1];
-            recordsToDo = args[2];
-        }
-        else{
-            state = args[1].toUpperCase();
-            printState = args[1];
-            recordsToDo = args[2];
-        }
-        if(state.equals("NONE")){
-            return;
-        }
-        if(recordsToDo < 1){
-            System.out.println("Invalid command. # of records has to be positive");
-            return;
-        }
-        Node root = binaryTree.root;
-        String print = titleLine + "\n";
-        while(root != null && recordsRec < recordsToDo){
-            if(root.state.equals(state)){
-                print += root.print + "\n";
-            }
-            root = root.right;
-        }
-        if(recordsRec == 0){
-            System.out.println("There are no records from " + printState);
-        }
-        else{
-            String num = Integer.toString(recordsRec);
-            System.out.println(num + "records are printed out for the state of " + printState);
-            System.out.println(print);
-        }
-        
-    }
-
-    private String convertState(String state){
-        String stateConv = state.toUpperCase();
-        States[] stateAr = States.values();
-        for(States st : stateAr){
-            if(stateConv.equals(st.getFullName())){
-                return st.getAbbreviation();
+    
+    public String getState(String state) {
+		/*
+		 * if(state.length() == 2) { state.toLowerCase(); }
+		 */
+        for(Map.Entry<String, String> entry: initials.entrySet()) {
+            if(state.equalsIgnoreCase(entry.getValue())) {
+                return entry.getKey();
             }
         }
         System.out.println("State of " + state + " does not exist!");
-        return "NONE";
+        return null;
     }
 
-    public void summaryData(){
-        if(binaryTree.getSize() == 0){
-            System.out.println("No available data");
-            return;
-        }
-        String print = "";
-        Node root = binaryTree.root;
-        String lastSt = "";
-        int totCas = 0;
-        int totDth = 0;
-        int totHos = 0;
-        while(root != null){
-            if(root.state.equals(lastSt)){
-                root = root.right;
-                continue;
-            }
-            lastSt = root.state;
-            print += root.printSum + "\n";
-            totCase += root.cases;
-            totDth += root.deaths;
-            totHos += root.hospitalized;
-            root = root.right;
-        }
-        System.out.println("Data Summary for " + binaryTree.nodes + " states");
-        System.out.println("State   Total Case  Total Death   Total Hospitalized");
-        System.out.println(print);
-        System.out.println("Total Cases: " + Integer.toString(totCas));
-        System.out.println("Total Deaths: " + Integer.toString(totDth));
-        System.out.println("Total Hospitalized: " + Integer.toString(totHos));
+    public static void main(String[] args) {
+    	Covid19TrackingManager main = new Covid19TrackingManager();
+        main.load("head_100_random_30.csv");
+        main.search();
+        main.searchState("pH");
+        main.searchState("va");
+
     }
 
-    public void dumpData(String filename){
-        int records = binaryTree.dumpData(filename);
-        System.out.println(records + "records have been saved in the " + filename + " file");
-    }
+    
+    
+    
 }
