@@ -2,15 +2,16 @@ package covid19trackingmanager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Covid19TrackingManager{
+public class Covid19TrackingManager {
 
     private String titleLine = "state   positive    negative    hospitalized   onVentilatorCurrently    onVentilatorCumulative   recovered   dataQualityGrade   death";
     private String summaryTitle = "";
     private ArrayList<Node> array;
 
-    public class Node(){
+    private class Node {
         private int date;
         private String state;
         private int positive;
@@ -23,7 +24,7 @@ public class Covid19TrackingManager{
         private int death;
  
         public Node(int date, String state, int positive, int negative, int hospitalized, 
-            int onVentilatorCurrently, int onVentilatorCumulative, int recovered, String dataQualityGrade, int death;){
+            int onVentilatorCurrently, int onVentilatorCumulative, int recovered, String dataQualityGrade, int death){
             this.date = date;
             this.state = state;
             this.positive = positive;
@@ -38,13 +39,13 @@ public class Covid19TrackingManager{
     }
     
     public static void main(String[] args){
-        if(length(args) == 0 || length(args) > 4){
+        if(args.length == 0 || args.length > 4){
             System.out.println("error, invalid number of inputs");
             return;
         }
         switch(args[0]){
             case "load":
-                this.loadFile(args[1]);
+                loadFile(args[1]);
                 break;
             case "search":
                 if(length(args) == 1){
@@ -106,7 +107,7 @@ public class Covid19TrackingManager{
 
     public Boolean validState(String state){
         String stateConv = state.toUpperCase();
-        States[] stateAr = States.values();
+        ArrayList stateAr = States.values();
         Boolean match = false;
         for(States st : stateAr){
             if(stateConv.equals(st.getFullName())){
