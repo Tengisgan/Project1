@@ -10,12 +10,13 @@ public class Covid19TrackingManager {
     
     private String titleLine = "state   positive    negative    hospitalized   onVentilatorCurrently    onVentilatorCumulative   recovered   dataQualityGrade   death";
     private String summaryTitle = "";
+    
     private HashMap<String, Node> map = new HashMap<String, Node>();
     
     public void load(String filename) {
         try {
             Scanner input = new Scanner(new File(filename));
-            HashMap<String, Node> map = new HashMap<String, Node>();
+
             int counter = 0;
             input.next();
             while(input.hasNext()) {
@@ -24,7 +25,7 @@ public class Covid19TrackingManager {
                     System.out.println("State of " + row[1] + " does not exist!");
                     continue;
                 }
-                
+
                 if(map.containsKey(row[1])) {
                     if(map.get(row[1]).get(0).equals(row[0])) {
                         String[] array = map.get(row[1]).getRow();
@@ -34,7 +35,7 @@ public class Covid19TrackingManager {
                             }
                         }
                         System.out.println("Data has been updated for the missing data in " + row[1]);
-                        
+
                     }
                     if(map.get(row[1]).isGradeHigher(row[8])) {
                         System.out.println("Low quality data rejected for " + row[1]);
@@ -43,7 +44,7 @@ public class Covid19TrackingManager {
                         map.put(row[1], new Node(row));
                         System.out.println("Data has been updated for " + row[1] + row[0]);
                     }
-                    
+
                 }
                 else {
                     map.put(row[1], new Node(row));
@@ -56,8 +57,9 @@ public class Covid19TrackingManager {
         catch (FileNotFoundException e) {
             System.out.println("File " + filename + " was not found");
         }
-        
+
     }
+    
     
     
     public void search() {
