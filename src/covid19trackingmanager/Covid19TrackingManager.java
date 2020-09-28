@@ -66,13 +66,11 @@ public class Covid19TrackingManager {
         int date = 0;
         for(Map.Entry<String, Node> ent : map.entrySet()) {
             int newDate = Integer.parseInt(ent.getValue().get(0));
-            System.out.println(newDate);
             if (newDate > date) {
                 date = newDate;
             }
         }
         String strDate = Integer.toString(date);
-        System.out.println(strDate);
         strDate = String.format("%s/%s/%s", strDate.substring(4, 6), strDate.substring(6, 8), strDate.substring(0, 4));
         this.searchDate(strDate);
     }
@@ -80,7 +78,6 @@ public class Covid19TrackingManager {
     public void searchDate(String date) {
         String print = "";
         int counter = 0;
-        System.out.println(map.isEmpty());
         for(Map.Entry<String, Node> ent: map.entrySet()) {
             String newDate = ent.getValue().getDate();
             if (newDate.equals(date)) {
@@ -267,11 +264,10 @@ public class Covid19TrackingManager {
     public static void main(String[] args) {
         Covid19TrackingManager main = new Covid19TrackingManager();
         main.load("head_100_random_30.csv");
-        main.searchDate("08/");
         main.search();
         main.searchState("pH", 1);
         main.searchState("virginia", 1);
-        main.searchDate("08/17/2020");
+        main.searchDate("08/18/2020");
     }
 
     
