@@ -15,6 +15,7 @@ public class Covid19TrackingManager {
     public void load(String filename) {
         try {
             Scanner input = new Scanner(new File(filename));
+            HashMap<String, Node> map = new HashMap<String, Node>();
             int counter = 0;
             input.next();
             while(input.hasNext()) {
@@ -23,30 +24,32 @@ public class Covid19TrackingManager {
                     System.out.println("State of " + row[1] + " does not exist!");
                     continue;
                 }
-                if(map.containsKey(row[1])) { // if states match
-                    if(map.get(row[1]).get(0).equals(row[0])) { // if dates match
-                    	if(map.get(row[1]).isGradeHigher(row[8])) { // if map grade is higher than the new grade
-                    		String[] array = map.get(row[1]).getRow();
-                    		for(int i = 0; i < array.length; i++) {
-                                if(array[i].equals("")) { // if there is an empty slot
-                                    map.get(row[1]).setColumn(i, row[i]); // update
-                                    System.out.println("Data has been updated for the missing data in " + row[1]);
-                                }
+                
+                if(map.containsKey(row[1])) {
+                    if(map.get(row[1]).get(0).equals(row[0])) {
+                        String[] array = map.get(row[1]).getRow();
+                        for(int i = 0; i < array.length; i++) {
+                            if(array[i].equals("")) {
+                                map.get(row[1]).setColumn(i, row[i]);
                             }
-                    		System.out.println("Low quality data rejected for " + row[1]);
                         }
-                    	else { // map grade is lower than the new grade
-                    		map.put(row[1], new Node(row)); // replace the old Node with the new one
-                            System.out.println("Data has been updated for " + row[1] + row[0]);
-                    	}
-                } // else the states match but the dates don't match
-                else { // the states don't match
+                        System.out.println("Data has been updated for the missing data in " + row[1]);
+                        
+                    }
+                    if(map.get(row[1]).isGradeHigher(row[8])) {
+                        System.out.println("Low quality data rejected for " + row[1]);
+
+                    } else {
+                        map.put(row[1], new Node(row));
+                        System.out.println("Data has been updated for " + row[1] + row[0]);
+                    }
+                    
+                }
+                else {
                     map.put(row[1], new Node(row));
                     counter++;
                 }
-                }
             }
-        
             System.out.println("Finished loading " + filename);
             System.out.println(counter + " records have been loaded");
         }
@@ -56,15 +59,18 @@ public class Covid19TrackingManager {
         
     }
     
+    
     public void search() {
     	int date = 0;
     	for(Map.Entry<String, Node> ent : map.entrySet()) {
     		int newDate = Integer.parseInt(ent.getValue().get(0));
+    		System.out.println(newDate);
     		if (newDate > date) {
     			date = newDate;
     		}
     	}
     	String strDate = Integer.toString(date);
+    	System.out.println(strDate);
     	strDate = String.format("%s/%s/%s", strDate.substring(4, 6), strDate.substring(6, 8), strDate.substring(0, 4));
     	this.searchDate(strDate);
     }
@@ -72,7 +78,8 @@ public class Covid19TrackingManager {
     public void searchDate(String date) {
     	String print = "";
     	int counter = 0;
-    	for(Map.Entry<String, Node> ent : map.entrySet()) {
+    	System.out.println(map.isEmpty());
+    	for(Map.Entry<String, Node> ent: map.entrySet()) {
     		String newDate = ent.getValue().getDate();
     		if (newDate.equals(date)) {
     			for(int index = 1; index < 10; index++) {
@@ -87,9 +94,35 @@ public class Covid19TrackingManager {
     	System.out.println(print);
     }
     
-    public void searchState(String state) {
-    	String conState = getState(state);
-    	
+    public void searchState(String state, int records) {
+        if(records <= 0) {
+            System.out.println("Invalid command. # of records has to be positive");
+        }
+        else {
+            String print = "";
+            String conState = getState(state);
+            int counter = 0;
+            while(counter < records) {
+                   for(Map.Entry<String, Node> ent : map.entrySet()) {
+                        if (ent.getValue().get(1).equals(conState)) {
+                            for(int i = 0; i < 10; i++) {
+                                if(i == 1) {
+                                    continue;
+                                }
+                                print += ent.getValue().get(i) + "    ";
+                            }
+                            counter++;
+                        }
+                    }
+            }
+            if (print == "") {
+                System.out.println("There are no records from " + state);
+            }
+            else {
+                System.out.println(counter + " records are printed out for the state of " + state);
+            }
+        }
+
     }
     
     private HashMap<String, String> initials;
@@ -232,10 +265,11 @@ public class Covid19TrackingManager {
     public static void main(String[] args) {
     	Covid19TrackingManager main = new Covid19TrackingManager();
         main.load("head_100_random_30.csv");
+        main.searchDate("08/");
         main.search();
-        main.searchState("pH");
-        main.searchState("va");
-
+        main.searchState("pH", 1);
+        main.searchState("virginia", 1);
+        main.searchDate("08/17/2020");
     }
 
     
