@@ -63,37 +63,37 @@ public class Covid19TrackingManager {
     
     
     public void search() {
-    	int date = 0;
-    	for(Map.Entry<String, Node> ent : map.entrySet()) {
-    		int newDate = Integer.parseInt(ent.getValue().get(0));
-    		System.out.println(newDate);
-    		if (newDate > date) {
-    			date = newDate;
-    		}
-    	}
-    	String strDate = Integer.toString(date);
-    	System.out.println(strDate);
-    	strDate = String.format("%s/%s/%s", strDate.substring(4, 6), strDate.substring(6, 8), strDate.substring(0, 4));
-    	this.searchDate(strDate);
+        int date = 0;
+        for(Map.Entry<String, Node> ent : map.entrySet()) {
+            int newDate = Integer.parseInt(ent.getValue().get(0));
+            System.out.println(newDate);
+            if (newDate > date) {
+                date = newDate;
+            }
+        }
+        String strDate = Integer.toString(date);
+        System.out.println(strDate);
+        strDate = String.format("%s/%s/%s", strDate.substring(4, 6), strDate.substring(6, 8), strDate.substring(0, 4));
+        this.searchDate(strDate);
     }
     
     public void searchDate(String date) {
-    	String print = "";
-    	int counter = 0;
-    	System.out.println(map.isEmpty());
-    	for(Map.Entry<String, Node> ent: map.entrySet()) {
-    		String newDate = ent.getValue().getDate();
-    		if (newDate.equals(date)) {
-    			for(int index = 1; index < 10; index++) {
-    				print += ent.getValue().get(index) + "    ";
-    			}
-    			print += "\n";
-    			counter++;
-    		}
-    	}
-    	System.out.println("There are " + counter + " records on " + date);
-    	System.out.println(titleLine);
-    	System.out.println(print);
+        String print = "";
+        int counter = 0;
+        System.out.println(map.isEmpty());
+        for(Map.Entry<String, Node> ent: map.entrySet()) {
+            String newDate = ent.getValue().getDate();
+            if (newDate.equals(date)) {
+                for(int index = 1; index < 10; index++) {
+                    print += ent.getValue().get(index) + "    ";
+                }
+                print += "\n";
+                counter++;
+            }
+        }
+        System.out.println("There are " + counter + " records on " + date);
+        System.out.println(titleLine);
+        System.out.println(print);
     }
     
     public void searchState(String state, int records) {
@@ -252,9 +252,9 @@ public class Covid19TrackingManager {
     }
     
     public String getState(String state) {
-		/*
-		 * if(state.length() == 2) { state.toLowerCase(); }
-		 */
+        /*
+         * if(state.length() == 2) { state.toLowerCase(); }
+         */
         for(Map.Entry<String, String> entry: initials.entrySet()) {
             if(state.equalsIgnoreCase(entry.getValue())) {
                 return entry.getKey();
@@ -265,7 +265,7 @@ public class Covid19TrackingManager {
     }
 
     public static void main(String[] args) {
-    	Covid19TrackingManager main = new Covid19TrackingManager();
+        Covid19TrackingManager main = new Covid19TrackingManager();
         main.load("head_100_random_30.csv");
         main.searchDate("08/");
         main.search();
