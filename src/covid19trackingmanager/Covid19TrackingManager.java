@@ -2,16 +2,21 @@ package covid19trackingmanager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Covid19TrackingManager {
     
     private String titleLine = "state   positive    negative    hospitalized   onVentilatorCurrently    onVentilatorCumulative   recovered   dataQualityGrade   death";
+    private String titleLine2 = "date    positive    negative    hospitalized   onVentilatorCurrently    onVentilatorCumulative   recovered   dataQualityGrade   death";
     private String summaryTitle = "";
     
     private HashMap<String, Node> map = new HashMap<String, Node>();
+    private HashMap<String, String> initials;
     
     public void load(String filename) {
         try {
@@ -72,28 +77,43 @@ public class Covid19TrackingManager {
         }
         String strDate = Integer.toString(date);
         strDate = String.format("%s/%s/%s", strDate.substring(4, 6), strDate.substring(6, 8), strDate.substring(0, 4));
-        this.searchDate(strDate);
+        this.searchDate(strDate, true);
     }
     
-    public void searchDate(String date) {
-        String print = "";
+    public void searchDate(String date, Boolean search) {
+//        ArrayList<String> print = new ArrayList<String>();
+    	String print = "";
         int counter = 0;
         for(Map.Entry<String, Node> ent: map.entrySet()) {
             String newDate = ent.getValue().getDate();
             if (newDate.equals(date)) {
+//            	String element = "";
                 for(int index = 1; index < 10; index++) {
-                    print += ent.getValue().get(index) + "    ";
+//                    element += ent.getValue().get(index) + "    ";
+                	print += ent.getValue().get(index) + "    ";
                 }
+//                element += "\n";
+//                print.add(element);
                 print += "\n";
                 counter++;
             }
         }
-        System.out.println("There are " + counter + " records on " + date);
-        System.out.println(titleLine);
-        System.out.println(print);
+        if(counter == 0 && search) {
+        	System.out.println("No available data");
+        }
+        else if(counter == 0) {
+        	System.out.println("There are no records on " + date);
+        }
+        else {
+        	System.out.println("There are " + counter + " records on " + date);
+        	System.out.println(titleLine);
+        	//System.out.println(sortedPrint(print, 6));
+        	System.out.println(print);
+        }
     }
     
     public void searchState(String state, int records) {
+    	
         if(records <= 0) {
             System.out.println("Invalid command. # of records has to be positive");
         }
@@ -101,7 +121,6 @@ public class Covid19TrackingManager {
             String print = "";
             String conState = getState(state);
             int counter = 0;
-            while(counter < records) {
                    for(Map.Entry<String, Node> ent : map.entrySet()) {
                         if (ent.getValue().get(1).equals(conState)) {
                             for(int i = 0; i < 10; i++) {
@@ -111,20 +130,72 @@ public class Covid19TrackingManager {
                                 print += ent.getValue().get(i) + "    ";
                             }
                             counter++;
+                            if(counter == records) {
+                            	break;
+                            }
                         }
                     }
-            }
             if (print == "") {
                 System.out.println("There are no records from " + state);
             }
             else {
                 System.out.println(counter + " records are printed out for the state of " + state);
+                System.out.println(titleLine2);
+                System.out.println(print);
             }
         }
 
     }
     
-    private HashMap<String, String> initials;
+    public void dumpData(String filename) {
+    	File file = new File(filename);
+    	try {
+    		FileWriter newFile = new FileWriter(filename);
+    		for(Map.Entry<String, Node> ent : map.entrySet()) {
+    			for(int i = 0; i < 10; i++) {
+    				newFile.write(ent.getValue().get(i) + "    ");
+    			}
+    		}
+    		newFile.close();
+    	}
+    	catch(IOException e) {
+    		System.out.println("Bad filename");
+    	}
+    	
+    }
+    
+    public void summaryData() {
+    	for(Map.Entry<String, Node> ent : map.entrySet()) {
+			for(int i = 0; i < 10; i++) {
+			}
+		}
+    }
+    
+//    public String sortedPrint(ArrayList<String> list, int numSub) {
+//    	
+//    	ArrayList<String> ret = new ArrayList<String>();
+//    	for(int index = 0; index < list.size(); index++) {
+//    		System.out.println(list.size());
+//    		String comp = list.get(index).substring(0, numSub);
+//    		Boolean added = false;
+//    		if(ret)
+//    		for(int jdex = 0; jdex < ret.size(); jdex++) {
+//    			if(comp.compareTo(ret.get(jdex).substring(0, numSub)) > 0) {
+//    				ret.add(jdex, list.get(index));
+//    				added = true;
+//    			}
+//    		}
+//    		if(!added) {
+//    			ret.add(list.get(index));
+//    		}
+//    	}
+//    	String print = "";
+//    	for(int index = 0; index < ret.size(); index++) {
+//    		print += ret.get(index) + "\n";
+//    	}
+//    	return print;
+//    }
+    
     
     public Covid19TrackingManager() {
         initials = new HashMap<String, String>();
@@ -254,7 +325,7 @@ public class Covid19TrackingManager {
          */
         for(Map.Entry<String, String> entry: initials.entrySet()) {
             if(state.equalsIgnoreCase(entry.getValue())) {
-                return entry.getKey();
+                return entry.getKey().toUpperCase();
             }
         }
         System.out.println("State of " + state + " does not exist!");
@@ -264,10 +335,20 @@ public class Covid19TrackingManager {
     public static void main(String[] args) {
         Covid19TrackingManager main = new Covid19TrackingManager();
         main.load("head_100_random_30.csv");
+        System.out.println("");
         main.search();
+        System.out.println("");
         main.searchState("pH", 1);
-        main.searchState("virginia", 1);
-        main.searchDate("08/18/2020");
+        System.out.println("");
+        main.searchState("idaho", 1);
+        System.out.println("");
+        main.searchDate("08/17/2020", false);
+        System.out.println("");
+        main.searchDate("08/17/2000", false);
+        System.out.println("");
+        main.dumpData("dump.csv");
+        System.out.println("");
+        main.summaryData();
     }
 
     
