@@ -349,9 +349,30 @@ public class Covid19TrackingManager {
         main.dumpData("dump.csv");
         System.out.println("");
         main.summaryData();
+        
+        if(args.length == 1 && args[0].equals("search")) {
+        	main.search();
+        }
+        else if(args.length == 1 && args[0].equals("summarydata")) {
+        	main.summaryData();
+        }
+        else if(args.length == 2 && args[0].equals("load")) {
+        	main.load(args[1]);
+        }
+        else if(args.length == 2 && args[0].equals("search")) {
+        	main.searchDate(args[1], false);
+        }
+        else if(args.length == 2 && args[0].equals("dumpdata")) {
+        	main.dumpData(args[1]);
+        }
+        else if(args.length == 3 && args[0].equals("search")) {
+        	main.searchState(args[1], Integer.parseInt(args[2]));
+        }
+        else if(args.length == 4 && args[0].equals("search")) {
+        	main.searchState(args[1]+args[2], Integer.parseInt(args[3]));
+        }
+        else {
+        	System.out.println("incorrect input");
+        }
     }
-
-    
-    
-    
 }
