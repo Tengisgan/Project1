@@ -376,19 +376,44 @@ public class Covid19TrackingManager {
         states.put("pr", "puerto rico");
         states.put("vi", "virgin islands");
     }
-
+    
     /**
      * Main class for running the program
      * @param args
      */
     public static void main(String[] args) {
         Covid19TrackingManager main = new Covid19TrackingManager();
-        main.load("head_100_random_30.csv");
-        main.search("ks", 10);
-        main.search("08/18/2020");
-        main.search();
-        main.dumpdata("dump.csv");
-        main.summarydata();
+//        main.load("head_100_random_30.csv");
+//        main.search("ks", 10);
+//        main.search("08/18/2020");
+//        main.search();
+//        main.dumpdata("dump.csv");
+//        main.summarydata();
+        
+        if(args.length == 1 && args[0].equals("search")) {
+        	main.search();
+        }
+        else if(args.length == 1 && args[0].equals("summarydata")) {
+        	main.summarydata();
+        }
+        else if(args.length == 2 && args[0].equals("load")) {
+        	main.load(args[1]);
+        }
+        else if(args.length == 2 && args[0].equals("search")) {
+        	main.search(args[1]);
+        }
+        else if(args.length == 2 && args[0].equals("dumpdata")) {
+        	main.dumpdata(args[1]);
+        }
+        else if(args.length == 3 && args[0].equals("search")) {
+        	main.search(args[1], Integer.parseInt(args[2]));
+        }
+        else if(args.length == 4 && args[0].equals("search")) {
+        	main.search(args[1]+args[2], Integer.parseInt(args[3]));
+        }
+        else {
+        	System.out.println("incorrect input");
+        }
     }
 
 
