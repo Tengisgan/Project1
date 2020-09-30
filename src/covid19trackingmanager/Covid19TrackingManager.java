@@ -21,6 +21,8 @@ import java.util.*;
  * @version 2020.09.29
  */
 public class Covid19TrackingManager {
+	
+	private static Covid19TrackingManager main = new Covid19TrackingManager();
       
     /**
      * A hashmap to store and manipulate the date. It contains
@@ -382,7 +384,11 @@ public class Covid19TrackingManager {
      * @param args
      */
     public static void main(String[] args) {
-        Covid19TrackingManager main = new Covid19TrackingManager();
+        
+        Scanner inpt = new Scanner(System.in);
+        String[] params;
+        params = inpt.nextLine().split(" "); 
+        
 //        main.load("head_100_random_30.csv");
 //        main.search("ks", 10);
 //        main.search("08/18/2020");
@@ -390,33 +396,27 @@ public class Covid19TrackingManager {
 //        main.dumpdata("dump.csv");
 //        main.summarydata();
         
-        if(args.length == 1 && args[0].equals("search")) {
+        if(params.length == 1 && params[0].equals("search")) {
         	main.search();
         }
-        else if(args.length == 1 && args[0].equals("summarydata")) {
+        else if(params.length == 1 && params[0].equals("summarydata")) {
         	main.summarydata();
         }
-        else if(args.length == 2 && args[0].equals("load")) {
-        	main.load(args[1]);
+        else if(params.length == 2 && params[0].equals("load")) {
+        	main.load(params[1]);
         }
-        else if(args.length == 2 && args[0].equals("search")) {
-        	main.search(args[1]);
+        else if(params.length == 2 && params[0].equals("search")) {
+        	main.search(params[1]);
         }
-        else if(args.length == 2 && args[0].equals("dumpdata")) {
-        	main.dumpdata(args[1]);
+        else if(params.length == 2 && params[0].equals("dumpdata")) {
+        	main.dumpdata(params[1]);
         }
-        else if(args.length == 3 && args[0].equals("search")) {
-        	main.search(args[1], Integer.parseInt(args[2]));
+        else if(params.length == 3 && params[0].equals("search")) {
+        	main.search(params[1], Integer.parseInt(params[2]));
         }
-        else if(args.length == 4 && args[0].equals("search")) {
-        	main.search(args[1]+args[2], Integer.parseInt(args[3]));
+        else if(params.length == 4 && params[0].equals("search")) {
+        	main.search(params[1]+params[2], Integer.parseInt(params[3]));
         }
-        else {
-        	System.out.println("incorrect input");
-        }
+        inpt.close();
     }
-
-
-
-
 }

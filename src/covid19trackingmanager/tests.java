@@ -1,5 +1,7 @@
 package covid19trackingmanager;
 
+import java.io.ByteArrayInputStream;
+
 import covid19trackingmanager.Covid19TrackingManager;
 import junit.framework.TestCase;
 
@@ -13,36 +15,43 @@ import junit.framework.TestCase;
  */
 public class tests extends TestCase {
 	
+	private String[] empty = {};
+	private String params;
+	
 	/**
 	 * file with data to be used for everything but the load tests
 	 */
 	public void setUp() {
-		String[] params = {"load", "head_100_random_30.csv"};
-    	Covid19TrackingManager.main(params);
+    	params = "load head_100_random_30.csv";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
 	}
 	
 	/**
 	 * tests loading a file that doesn't reject any records
 	 */
     public void testLoad1() {
-    	String[] params = {"load", "head_100_random_30.csv"};
-    	Covid19TrackingManager.main(params);
+    	params = "load head_100_random_30.csv";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests loading a file that does not exist
      */
     public void testLoad2() {
-    	String[] params = {"load", "head_100_random.csv"};
-    	Covid19TrackingManager.main(params);
+    	String params = "load head_100_random.csv";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests loading a file where low quality data is rejected
      */
     public void testLoad3() {
-    	String[] params = {"load", "head_200_random_70.csv"};
-    	Covid19TrackingManager.main(params);
+    	String params = "load head_200_random_70.csv";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
@@ -61,72 +70,81 @@ public class tests extends TestCase {
      * tests searching for a state with an invalid name
      */
     public void testState1() {
-    	String[] params = {"search", "vrg", "1"};
-    	Covid19TrackingManager.main(params);
+    	String params = "search vrg 1";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests searching for a state with no records
      */
     public void testState2() {
-    	String[] params = {"search", "hi", "1"};
-    	Covid19TrackingManager.main(params);
+    	String params = "search hi 1";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests searching for a valid state with an invalid number or record requests - negative
      */
     public void testState3() {
-    	String[] params = {"search", "ks", "-1"};
-    	Covid19TrackingManager.main(params);
+    	String params = "search ks -1";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests searching for state with correct output
      */
     public void testState4() {
-    	String[] params = {"search", "ks", "10"};
-    	Covid19TrackingManager.main(params);
+    	String params = "search ks 10";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests searching date without additional inputs - most recent date
      */
     public void testDate1() {
-    	String[] params = {"search"};
-    	Covid19TrackingManager.main(params);
+    	String params = "search";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests searching for date that exists
      */
     public void testDate2() {
-    	String[] params = {"search", "08/18/2020"};
-    	Covid19TrackingManager.main(params);
+    	String params = "search 08/18/2020";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests searching for date that has no records
      */
     public void testDate3() {
-    	String[] params = {"search", "08/18/2000"};
-    	Covid19TrackingManager.main(params);
+    	String params = "search 08/18/2000";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests dump data
      */
     public void testDump() {
-    	String[] params = {"dumpdata", "dump.csv"};
-    	Covid19TrackingManager.main(params);
+    	String params = "dumpdata dump.csv";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
     /**
      * tests summary data
      */
     public void testSummary() {
-    	String[] params = {"summarydata"};
-    	Covid19TrackingManager.main(params);
+    	String params = "summarydata";
+    	System.setIn(new ByteArrayInputStream(params.getBytes()));
+    	Covid19TrackingManager.main(empty);
     }
     
 }
